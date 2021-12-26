@@ -53,11 +53,13 @@ page {
     border-top: 1px solid #fafafa;
     /* position: fixed; */
     margin-top: 90rpx;
+    overflow: hidden;
 }
 
 .catalog .nav {
     width: 162rpx;
     height: 100%;
+    overflow-y: auto;
 }
 
 .catalog .nav .item {
@@ -78,6 +80,7 @@ page {
 .catalog .cate {
     flex: 1;
     height: 100%;
+    overflow-y: auto;
     padding: 0 24rpx 0 30rpx;
 }
 
@@ -99,7 +102,7 @@ page {
     color: #666;
 }
 
-.catalog .cate .loading-wrap {
+.loading-wrap {
     width: 100%;
     height: 500rpx;
     display: flex;
@@ -108,12 +111,12 @@ page {
     align-items: center;
     
 }
-.catalog .cate .loading-wrap .img{
+.loading-wrap .img{
     width: 60rpx;
     height: 60rpx;
     margin-bottom: 20rpx;
 }
-.catalog .cate .loading-wrap .text{
+.loading-wrap .text{
     font-size: 26rpx;
     color: #999;
 }

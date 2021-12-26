@@ -68,10 +68,21 @@ Page({
         });
     },
     postLogin(info) {
+        console.log('获取用户信息：', info);
+        /**
+         * code: "053GU3100pbMZM17Y4200VnTXf0GU31w"
+         * encryptedData: "cSCtUvhU+hpT1hdLWTRb7QHfr973F944qJSrAWy7sCrYYItynntEsFYwPqmDf0cq7cdC28GMRK2rCDWt0Rkq6PvGWViRXfJUwOU7tQE9NdFguUY+U0Ajp++HmbBjqGvVc2a8nupthDyNlueRSKqp3iG2dX4rNKrXp1ajrljIvBqPbD4OypfTU/VHfIle2Z8kj02PRNB8Wb3zeI+teSyAhMwg6ZnGdj1QcKGnQd+0mLoR1AIR8Btj+jO1543PAzn81cqxwWBiZcT3lPRujdxX+ud1V2OxEzpP/tVCMIdfQJR1eGbbIxFaHc58f+fSAlxqYe+L1dJiogH1nWuBRuqcjrqP6Twl6G/4IIJraMAhvSVmcCiMUmeG4NMsNYFk99jKWz7dGC9+xtITgifUXsQILb0ubt7SqMknKDlCkUTaT8Q="
+         * iv: "7YrBTA/yaNajsjvV15T5Fg=="
+         * rawData: "{"nickName":"白砂糖的白","gender":0,"language":"zh_CN","city":"","province":"","country":"","avatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/2IREcf6AoqRoZiadicUbStib4TuehK8EnuxicUaHqvZCiblRqusw7FITDHP8lp3IcqZZdJNhu10oVbNfYz0rOClmpsA/132"}"
+         * signature: "6fcb61c466f3998e06b7166eb3d7aa8f0e778ff8"
+         */
+
         util.request(api.AuthLoginByWeixin, {
-            info: info
+            // info: info
+            username: 'test',
+            password: 'abc123'
         }, 'POST').then(function (res) {
-            console.log(res);
+            console.log('------userlogin',res);
             if (res.errno === 0) {
                 wx.setStorageSync('userInfo', res.data.userInfo);
                 wx.setStorageSync('token', res.data.token);

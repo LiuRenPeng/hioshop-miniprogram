@@ -6,10 +6,9 @@ Page({
         navList: [],
         categoryList: [],
         currentCategory: {},
-        goodsCount: 0,
-        nowIndex: 0,
-        nowId: 0,
-        list: [],
+        // goodsCount: 0,
+        selectedId: 0,
+        secondNavList: [],
         allPage: 1,
         allCount: 0,
         size: 8,
@@ -33,34 +32,41 @@ Page({
     },
     onPullDownRefresh: function() {
         wx.showNavigationBarLoading()
-        this.getCatalog();
+        this.getCategoryList();
         wx.hideNavigationBarLoading() //完成停止加载
         wx.stopPullDownRefresh() //停止下拉刷新
     },
-    getCatalog: function() {
+    getCategoryList: function() {
         //CatalogList
         let that = this;
-        util.request(api.CatalogList).then(function(res) {
-            that.setData({
-                navList: res.data.categoryList,
-            });
+        util.request(api.CategoryList).then(function(res) {
+            console.log(res);
+            const { code, data } = res;
+            if(code == 200) {
+                that.setData({
+                    navList: data,
+                    loading: 0,
+                    selectedId: data[0].id,
+                    secondNavList: data[0].children
+                });
+            }
         });
-        util.request(api.GoodsCount).then(function(res) {
-            that.setData({
-                goodsCount: res.data.goodsCount
-            });
-        });
+        // util.request(api.GoodsCount).then(function(res) {
+        //     that.setData({
+        //         goodsCount: res.data.goodsCount
+        //     });
+        // });
     },
-    getCurrentCategory: function(id) {
-        let that = this;
-        util.request(api.CatalogCurrent, {
-            id: id
-        }).then(function(res) {
-            that.setData({
-                currentCategory: res.data
-            });
-        });
-    },
+    // getCurrentCategory: function(id) {
+    //     let that = this;
+    //     util.request(api.CatalogCurrent, {
+    //         id: id
+    //     }).then(function(res) {
+    //         that.setData({
+    //             currentCategory: res.data
+    //         });
+    //     });
+    // },
     getCurrentList: function(id) {
         let that = this;
         util.request(api.GetCurrentList, {
@@ -87,72 +93,74 @@ Page({
         });
     },
     onShow: function() {
-        this.getChannelShowInfo();
-        let id = this.data.nowId;
-        let nowId = wx.getStorageSync('categoryId');
-        if(id == 0 && nowId === 0){
-            return false
-        }
-        else if (nowId == 0 && nowId === '') {
-            this.setData({
-                list: [],
-                allPage: 1,
-                allCount: 0,
-                size: 8,
-                loading: 1
-            })
-            this.getCurrentList(0);
-            this.setData({
-                nowId: 0,
-                currentCategory: {}
-            })
-            wx.setStorageSync('categoryId', 0)
-        } else if(id != nowId) {
-            this.setData({
-                list: [],
-                allPage: 1,
-                allCount: 0,
-                size: 8,
-                loading: 1
-            })
-            this.getCurrentList(nowId);
-            this.getCurrentCategory(nowId);
-            this.setData({
-                nowId: nowId
-            })
-            wx.setStorageSync('categoryId', nowId)
-        }
+        // this.getChannelShowInfo();
+        // let id = this.data.selectedId;
+        // let selectedId = wx.getStorageSync('categoryId');
+        // if(id == 0 && selectedId === 0){
+        //     return false
+        // }
+        // else if (selectedId == 0 && selectedId === '') {
+        //     this.setData({
+        //         list: [],
+        //         allPage: 1,
+        //         allCount: 0,
+        //         size: 8,
+        //         loading: 1
+        //     })
+        //     this.getCurrentList(0);
+        //     this.setData({
+        //         selectedId: 0,
+        //         currentCategory: {}
+        //     })
+        //     wx.setStorageSync('categoryId', 0)
+        // } else if(id != selectedId) {
+        //     this.setData({
+        //         list: [],
+        //         allPage: 1,
+        //         allCount: 0,
+        //         size: 8,
+        //         loading: 1
+        //     })
+        //     this.getCurrentList(selectedId);
+        //     this.getCurrentCategory(selectedId);
+        //     this.setData({
+        //         selectedId: selectedId
+        //     })
+        //     wx.setStorageSync('categoryId', selectedId)
+        // }
         
-        this.getCatalog();
+        this.getCategoryList();
     },
+    // 点击一级类目
     switchCate: function(e) {
         let id = e.currentTarget.dataset.id;
-        let nowId = this.data.nowId;
-        if (id == nowId) {
-            return false;
-        } else {
-            this.setData({
-                list: [],
-                allPage: 1,
-                allCount: 0,
-                size: 8,
-                loading: 1
-            })
-            if (id == 0) {
-                this.getCurrentList(0);
-                this.setData({
-                    currentCategory: {}
-                })
-            } else {
-                wx.setStorageSync('categoryId', id)
-                this.getCurrentList(id);
-                this.getCurrentCategory(id);
-            }
+        // let selectedId = this.data.selectedId;
+        // if (id == selectedId) {
+        //     return false;
+        // } else {
+        //     this.setData({
+        //         list: [],
+        //         allPage: 1,
+        //         allCount: 0,
+        //         size: 8,
+        //         loading: 1
+        //     })
+        //     if (id == 0) {
+        //         this.getCurrentList(0);
+        //         this.setData({
+        //             currentCategory: {}
+        //         })
+        //     } else {
+        //         wx.setStorageSync('categoryId', id)
+        //         this.getCurrentList(id);
+        //         this.getCurrentCategory(id);
+        //     }
             wx.setStorageSync('categoryId', id)
             this.setData({
-                nowId: id
+                selectedId: id,
+                secondNavList: this.data.navList.find(nav => nav.id === id).children
             })
-        }
+        // }
     },
     onBottom: function() {
         let that = this;
@@ -165,11 +173,11 @@ Page({
         that.setData({
             allPage: that.data.allPage + 1
         });
-        let nowId = that.data.nowId;
-        if (nowId == 0 || nowId == undefined) {
+        let selectedId = that.data.selectedId;
+        if (selectedId == 0 || selectedId == undefined) {
             that.getCurrentList(0);
         } else {
-            that.getCurrentList(nowId);
+            that.getCurrentList(selectedId);
         }
     }
 })

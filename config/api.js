@@ -9,7 +9,7 @@ module.exports = {
     NewProductList: ApiRootUrl + '/home/newProductList', // 新品推荐商品
     RecommendProductList: ApiRootUrl + '/home/recommendProductList', // 推荐商品
     // 分类
-    CatalogList: ApiRootUrl + 'catalog/index', //分类目录全部分类数据接口
+    CategoryList: ApiRootUrl + '/product/categoryTreeList', //分类目录全部分类数据接口
     CatalogCurrent: ApiRootUrl + 'catalog/current', //分类目录当前分类数据接口
     GetCurrentList: ApiRootUrl + 'catalog/currentlist',
     // 购物车
