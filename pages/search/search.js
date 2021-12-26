@@ -6,17 +6,21 @@ Page({
     data: {
         keywrod: '',
         searchStatus: false,
+        pageNum: 1,
+        pageSize: 10,
         goodsList: [],
         helpKeyword: [],
         historyKeyword: [],
         categoryFilter: false,
-        currentSortType: 'default',
+        currentSortType: 0, // 0->按相关度；1->按新品；2->按销量；3->价格从低到高；4->价格从高到低
         filterCategory: [],
         defaultKeyword: {},
         hotKeyword: [],
         currentSortOrder: 'desc',
-        salesSortOrder:'desc',
+        // salesSortOrder: 0, 
         categoryId: 0,
+        loading: true,
+        noMore: 0
     },
     //事件处理函数
     closeSearch: function () {
@@ -25,11 +29,14 @@ Page({
     clearKeyword: function () {
         this.setData({
             keyword: '',
-            searchStatus: false
+            // searchStatus: false
         });
     },
     onLoad: function () {
-        this.getSearchKeyword();
+        // this.getSearchKeyword();
+    },
+    onShow: function () {
+        // this.getGoodsList();
     },
     getSearchKeyword() {
         let that = this;
@@ -47,9 +54,10 @@ Page({
     inputChange: function (e) {
         this.setData({
             keyword: e.detail.value,
-            searchStatus: false
+            // searchStatus: false
         });
-        this.getHelpKeyword();
+        this.getGoodsList();
+        // this.getHelpKeyword();
     },
     getHelpKeyword: function () {
         let that = this;
@@ -62,13 +70,13 @@ Page({
         });
     },
     inputFocus: function () {
-        this.setData({
-            searchStatus: false,
-            goodsList: []
-        });
+        // this.setData({
+        //     searchStatus: false,
+        //     goodsList: []
+        // });
 
         if (this.data.keyword) {
-            this.getHelpKeyword();
+            // this.getHelpKeyword();
         }
     },
     clearHistory: function () {
@@ -82,20 +90,33 @@ Page({
     },
     getGoodsList: function () {
         let that = this;
-        util.request(api.GoodsList, { keyword: that.data.keyword,sort: that.data.currentSortType, order: that.data.currentSortOrder, sales: that.data.salesSortOrder}).then(function (res) {
-            if (res.errno === 0) {
-                that.setData({
-                    searchStatus: true,
-                    // categoryFilter: false,
-                    goodsList: res.data,
-                    // filterCategory: res.data.filterCategory,
-                    // page: res.data.currentPage,
-                    //   size: res.data.numsPerPage
-                });
-            }
-            //重新获取关键词
-            that.getSearchKeyword();
-        });
+        const { keyword, currentSortType, pageNum, pageSize } = this.data;
+        if (keyword) {
+            util.request(api.GoodsList, {
+                keyword: keyword,
+                sort: currentSortType,
+                pageNum: pageNum,
+                pageSize: pageSize
+                // order: that.data.currentSortOrder,
+                // sales: that.data.salesSortOrder
+            }).then(function (res) {
+                const { code, data } = res;
+                if (code === 200) {
+                    that.setData({
+                        searchStatus: true,
+                        // categoryFilter: false,
+                        goodsList: data.list,
+                        noMore: data.totalPage <= pageNum,
+                        loading: false
+                        // filterCategory: res.data.filterCategory,
+                        // page: res.data.currentPage,
+                        //   size: res.data.numsPerPage
+                    });
+                }
+                //重新获取关键词
+                // that.getSearchKeyword();
+            });
+        }
     },
     onKeywordTap: function (event) {
         this.getSearchResult(event.target.dataset.keyword);
@@ -113,41 +134,62 @@ Page({
     openSortFilter: function (event) {
         let currentId = event.currentTarget.id;
         switch (currentId) {
+            // 销量排序
             case 'salesSort':
-                let _SortOrder = 'asc';
-                if (this.data.salesSortOrder == 'asc') {
-                    _SortOrder = 'desc';
-                }
+                // let _SortOrder = 'asc';
+                // if (this.data.salesSortOrder == 'asc') {
+                //     _SortOrder = 'desc';
+                // }
                 this.setData({
-                    'currentSortType': 'sales',
-                    'currentSortOrder': 'asc',
-                    'salesSortOrder': _SortOrder
+                    currentSortType: 2, // 'sales',
+                    // 'currentSortOrder': 'asc',
+                    // 'salesSortOrder': _SortOrder
                 });
                 this.getGoodsList();
                 break;
             case 'priceSort':
-                let tmpSortOrder = 'asc';
-                if (this.data.currentSortOrder == 'asc') {
-                    tmpSortOrder = 'desc';
-                }
+                // let tmpSortOrder = 'asc';
+                // if (this.data.currentSortOrder == 'asc') {
+                //     tmpSortOrder = 'desc';
+                // }
+                const { currentSortType } = this.data;
                 this.setData({
-                    'currentSortType': 'price',
-                    'currentSortOrder': tmpSortOrder,
-                    'salesSortOrder': 'asc'
+                    currentSortType: currentSortType === 3 ? 4 : 3,
+                    // 'currentSortOrder': tmpSortOrder,
+                    // 'salesSortOrder': 'asc'
                 });
                 this.getGoodsList();
                 break;
             default:
                 //综合排序
                 this.setData({
-                    'currentSortType': 'default',
-                    'currentSortOrder': 'desc',
-                    'salesSortOrder': 'desc'
+                    currentSortType: 0,
+                    // 'currentSortOrder': 'desc',
+                    // 'salesSortOrder': 'desc'
                 });
                 this.getGoodsList();
         }
     },
     onKeywordConfirm(event) {
         this.getSearchResult(event.detail.value);
+    },
+
+    //下拉刷新
+    onPullDownRefresh: function () {
+        wx.showNavigationBarLoading()
+        this.getGoodsList();
+        wx.hideNavigationBarLoading() //完成停止加载
+        wx.stopPullDownRefresh() //停止下拉刷新
+    },
+
+    // 滚动加载下一页
+    scrollToLower: function() {
+        if (!this.data.noMore) {
+            this.setData({
+                loading: true,
+                pageNum: this.data.pageNum + 1
+            });
+            this.getGoodsList();
+        }
     }
 })

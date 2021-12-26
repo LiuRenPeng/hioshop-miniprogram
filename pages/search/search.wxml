@@ -7,7 +7,7 @@
         </view>
         <view class="right" bindtap="closeSearch">取消</view>
     </view>
-    <view class="no-search" wx:if="{{ !searchStatus}}">
+    <view class="no-search" wx:if="{{!searchStatus}}">
         <view class="serach-keywords search-history" wx:if="{{!keyword  && historyKeyword.length}}">
             <view class="h">
                 <text class="title">历史记录</text>
@@ -33,49 +33,50 @@
     <view class="search-result" wx:if="{{ searchStatus && goodsList.length}}">
         <view class="sort">
             <view class="sort-box">
-                <view class="item {{currentSortType == 'default' ? 'active' : ''}}" bindtap="openSortFilter" id="defaultSort">
+                <view class="item {{currentSortType == 0 ? 'active' : ''}}" bindtap="openSortFilter" id="defaultSort">
                     <view class="txt">综合</view>
                 </view>
-                <view class="item {{currentSortType == 'price' ? 'active' : ''}}" bindtap="openSortFilter" id="priceSort">
+                <view class="item {{currentSortType == 3 || currentSortType == 4  ? 'active' : ''}}" bindtap="openSortFilter" id="priceSort">
                     <view class="txt">价格</view>
-                    <image class="icon" src="/images/icon/order-by.png" wx:if="{{currentSortType == 'default' || currentSortType == 'sales'}}"></image>
-                    <block wx:else>
-                        <image class="icon" wx:if="{{currentSortOrder == 'asc'}}" src='/images/icon/asc.png'></image>
-                        <image class="icon" wx:elif="{{currentSortOrder == 'desc'}}" src='/images/icon/desc.png'></image>
-                    </block>
+                    <!-- <image class="icon" src="/images/icon/order-by.png" wx:if="{{currentSortType == 0 || currentSortType == 2}}"></image> -->
+                    <!-- <block wx:else> -->
+                        <image class="icon" wx:if="{{currentSortType == 3}}" src='/images/icon/asc.png'></image>
+                        <image class="icon" wx:elif="{{currentSortType == 4}}" src='/images/icon/desc.png'></image>
+                    <!-- </block> -->
                 </view>
-                <view class="item {{currentSortType == 'sales' ? 'active' : ''}}" bindtap="openSortFilter" id="salesSort">
+                <view class="item {{currentSortType == 2 ? 'active' : ''}}" bindtap="openSortFilter" id="salesSort">
                     <view class="txt">销量</view>
-                    <image class="icon" src="/images/icon/order-by.png" wx:if="{{currentSortType == 'default' || currentSortType == 'price'}}"></image>
-                    <block wx:else>
-                        <image class="icon" wx:if="{{salesSortOrder == 'asc'}}" src='/images/icon/asc.png'></image>
-                        <image class="icon" wx:elif="{{salesSortOrder == 'desc'}}" src='/images/icon/desc.png'></image>
-                    </block>
+                    <!-- <image class="icon" src="/images/icon/order-by.png" wx:if="{{currentSortType == 0 || currentSortType == 3 || currentSortType == 4}}"></image> -->
+                    <!-- <block wx:else> -->
+                        <!-- <image class="icon" src='/images/icon/asc.png'></image> -->
+                        <!-- <image class="icon" wx:if="{{salesSortOrder == 'asc'}}" src='/images/icon/asc.png'></image> -->
+                        <!-- <image class="icon" wx:elif="{{salesSortOrder == 'desc'}}" src='/images/icon/desc.png'></image> -->
+                    <!-- </block> -->
                 </view>
             </view>
         </view>
         <view class="cate-item">
             <view class="b">
                 <view class='list-wrap clearfix'>
-                    <view class="goods-box {{(iindex+1)%2 == 0?'no-margin':''}}" wx:for="{{goodsList}}" wx:for-index="iindex" wx:for-item="iitem" wx:key="id">
-                        <navigator hover-class='none' class='navi-url' url="/pages/goods/goods?id={{iitem.id}}">
+                    <view class="goods-box {{(index+1)%2 == 0?'no-margin':''}}" wx:for="{{goodsList}}" wx:for-index="index" wx:for-item="item" wx:key="id">
+                        <navigator hover-class='none' class='navi-url' url="/pages/goods/goods?id={{item.id}}">
                             <view class="box">
-                                <image src="{{iitem.list_pic_url}}" class="image">
-                                    <view wx:if="{{iitem.is_new == 1}}" class='new-tag'>新品</view>
+                                <image src="{{item.pic}}" class="image">
+                                    <view wx:if="{{item.newStatus == 1}}" class='new-tag'>新品</view>
                                 </image>
-                                <block wx:if="{{iitem.goods_number == 0}}">
+                                <block wx:if="{{item.stock == 0}}">
                                     <!-- <view class='no-goods-mask'></view> -->
                                     <view class='sold-img'>
                                         <image class='soldout' src='/images/icon/sold-out.png'></image>
                                     </view>
                                 </block>
                             </view>
-                            <view class="goods-info {{iitem.goods_number == 0?'fast-out-status':''}}">
-                                <view class="goods-title">{{iitem.name}}</view>
-                                <view class="goods-intro">{{iitem.goods_brief}}</view>
+                            <view class="goods-info {{item.stock == 0?'fast-out-status':''}}">
+                                <view class="goods-title">{{item.name}}</view>
+                                <view class="goods-intro">{{item.subTitle}}</view>
                                 <view class='price-container'>
                                     <view class='l'>
-                                        <view class='h'>￥{{iitem.min_retail_price}}</view>
+                                        <view class='h'>￥{{item.price}}</view>
                                     </view>
                                 </view>
                             </view>
@@ -84,7 +85,8 @@
                 </view>
             </view>
         </view>
-        <view class='no-more'>没有更多商品了</view>
+        <view class='no-more' wx:if="{{loading}}">加载中</view>
+        <view class='no-more' wx:if="{{noMore}}">没有更多商品了</view>
     </view>
 
     <view class="search-result-empty" wx:if="{{!goodsList.length && searchStatus}}">
