@@ -64,10 +64,21 @@ function testMobile(num) {
 }
 
 /**
- * 封封微信的的request
+ * 封装微信的的request
  */
 function request(url, data = {}, method = "GET") {
     return new Promise(function(resolve, reject) {
+        if(url.includes('{')){
+            const reg = /\{(.+?)\}/g;
+            const keys = url.match(reg);
+            url = url.split(keys[0])[0];
+            keys.forEach(key => {
+                const paramsKey = key.replace('{', '').replace('}', '');
+                const value = data[paramsKey];
+                delete data[paramsKey];
+                url = url + value + '/'
+            })
+        }
         wx.request({
             url: url,
             data: data,
