@@ -1,19 +1,20 @@
-// const ApiRootUrl = 'http://localhost:8360/api/';
-// const ApiRootUrl = 'http://192.168.0.108:8360/api/';
-const ApiRootUrl = 'https://www.guxiaoling.com:8466/api/';
+const ApiRootUrl = 'http://portal.cross-board-mall.demo';
 
 module.exports = {
     // 登录
-    AuthLoginByWeixin: ApiRootUrl + 'auth/loginByWeixin', //微信登录
+    AuthLoginByWeixin: ApiRootUrl + '/sso/login', //微信登录
     // 首页
-    IndexUrl: ApiRootUrl + 'index/appInfo', //首页数据接口
+    IndexUrl: ApiRootUrl + '/home/content', //首页数据接口
+    HotProductList: ApiRootUrl +  '/home/hotProductList',  //人气推荐商品
+    NewProductList: ApiRootUrl + '/home/newProductList', // 新品推荐商品
+    RecommendProductList: ApiRootUrl + '/home/recommendProductList', // 推荐商品
     // 分类
     CatalogList: ApiRootUrl + 'catalog/index', //分类目录全部分类数据接口
     CatalogCurrent: ApiRootUrl + 'catalog/current', //分类目录当前分类数据接口
     GetCurrentList: ApiRootUrl + 'catalog/currentlist',
     // 购物车
     CartAdd: ApiRootUrl + 'cart/add', // 添加商品到购物车
-    CartList: ApiRootUrl + 'cart/index', //获取购物车的数据
+    CartList: ApiRootUrl + '/cart/list', //获取购物车的数据
     CartUpdate: ApiRootUrl + 'cart/update', // 更新购物车的商品
     CartDelete: ApiRootUrl + 'cart/delete', // 删除购物车的商品
     CartChecked: ApiRootUrl + 'cart/checked', // 选择或取消选择商品
@@ -21,8 +22,8 @@ module.exports = {
     CartCheckout: ApiRootUrl + 'cart/checkout', // 下单前信息确认
     // 商品
     GoodsCount: ApiRootUrl + 'goods/count', //统计商品总数
-    GoodsDetail: ApiRootUrl + 'goods/detail', //获得商品的详情
-    GoodsList: ApiRootUrl + 'goods/list', //获得商品列表
+    GoodsDetail: ApiRootUrl + '/product/detail/{id}', //获得商品的详情
+    GoodsList: ApiRootUrl + '/product/search', //获得商品列表
     GoodsShare: ApiRootUrl + 'goods/goodsShare', //获得商品的详情
     SaveUserId: ApiRootUrl + 'goods/saveUserId',
     // 收货地址

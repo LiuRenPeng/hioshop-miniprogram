@@ -9,14 +9,14 @@
         <image class="icon" src="/images/icon/search.png"></image>
         <text class="txt">搜索,发现更多好物</text>
     </view>
-    <view class='banner-wrap' wx:if="{{show_banner && banner.length > 0}}">
+    <view class='banner-wrap' wx:if="{{ banner.length > 0}}">
         <swiper class="banner" indicator-dots="true" autoplay="{{autoplay}}" interval="3000" duration="1000"   >
             <swiper-item wx:for="{{banner}}" wx:key="id">
-                <navigator wx:if="{{item.link_type == 0}}" url="/pages/goods/goods?id={{item.goods_id}}">
-                    <image src="{{item.image_url}}" background-size="cover"></image>
-                </navigator>
-                <navigator wx:elif="{{item.link_type == 1}}" url="{{item.link}}">
-                    <image src="{{item.image_url}}" background-size="cover"></image>
+                <!-- <navigator wx:if="{{item.link_type == 0}}" url="/pages/goods/goods?id={{item.goods_id}}">
+                    <image src="{{item.pic}}" background-size="cover"></image>
+                </navigator> -->
+                <navigator url="{{item.url || ''}}">
+                    <image src="{{item.pic}}" background-size="cover"></image>
                 </navigator>
             </swiper-item>
         </swiper>
@@ -73,8 +73,8 @@
                 <view class="new-box {{(iindex+1)%3 == 0?'no-margin':''}}" wx:for="{{item.goodsList}}" wx:for-index="iindex" wx:for-item="iitem" wx:key="id">
                     <navigator hover-class='none' class='navi-url' url="/pages/goods/goods?id={{iitem.id}}">
                         <view class="box">
-                            <image src="{{iitem.list_pic_url}}" class="image">
-                                <view wx:if="{{iitem.is_new == 1}}" class='new-tag'>新品</view>
+                            <image src="{{iitem.pic}}" class="image">
+                                <view wx:if="{{iitem.newStatus == 1}}" class='new-tag'>新品</view>
                             </image>
                             <block wx:if="{{iitem.goods_number <= 0}}">
                                 <view class='sold-img'>
@@ -86,14 +86,14 @@
                             <view class="goods-title">{{iitem.name}}</view>
                             <view class='price-container'>
                                 <view class='l'>
-                                    <view class='h'>￥{{iitem.min_retail_price}}</view>
+                                    <view class='h'>￥{{iitem.price}}</view>
                                 </view>
                             </view>
                         </view>
                     </navigator>
                 </view>
             </view>
-            <view class="more-category" data-cateid="{{item.id}}" bindtap="goCategory">点击查看更多{{item.name}}</view>
+            <view class="more-category" wx:if="{{item.moreCategory}}" data-cateid="{{item.id}}" bindtap="goCategory">点击查看更多{{item.name}}</view>
         </view>
     </view>
     <!-- <ad unit-id="adunit-b6fcdb43b7913591"></ad> -->
@@ -101,5 +101,5 @@
 </view>
 <view class="loading" style="height:{{sysHeight}}px" wx:else>
     <image class="img" src="/images/icon/loading.gif"></image>
-    <view class="text">海风吹啊吹</view>
+    <view class="text">加载中</view>
 </view>

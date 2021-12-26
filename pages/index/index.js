@@ -19,20 +19,21 @@ Page({
         sysHeight: 0,
         loading: 0,
         autoplay:true,
-        showContact:1,
+        showContact: 0, // 是否展示客服按钮，暂时隐藏
     },
     onPageScroll: function (e) {
-        let scrollTop = e.scrollTop;
-        let that = this;
-        if (scrollTop >= 2000) {
-            that.setData({
-                showContact: 0
-            })
-        } else {
-            that.setData({
-                showContact: 1
-            })
-        }
+        // 滚动显示客服按钮，暂时隐藏
+        // let scrollTop = e.scrollTop;
+        // let that = this;
+        // if (scrollTop >= 2000) {
+        //     that.setData({
+        //         showContact: 0
+        //     })
+        // } else {
+        //     that.setData({
+        //         showContact: 1
+        //     })
+        // }
     },
     onHide:function(){
         this.setData({
@@ -70,12 +71,13 @@ Page({
     getIndexData: function () {
         let that = this;
         util.request(api.IndexUrl).then(function (res) {
-            if (res.errno === 0) {
+            if (res.code === 200) {
+                const { data } = res;
                 that.setData({
-                    floorGoods: res.data.categoryList,
-                    banner: res.data.banner,
-                    channel: res.data.channel,
-                    notice: res.data.notice,
+                    // floorGoods: data.categoryList,
+                    banner: data.advertiseList,
+                    channel: data.channel,
+                    // notice: data.notice,
                     loading: 1,
                 });
                 let cartGoodsCount = '';
@@ -93,11 +95,51 @@ Page({
             }
         });
     },
+    getProductList: function () {
+        let that = this;
+        util.request(api.HotProductList).then(res => {
+            const { data, code } = res;
+            if (code === 200) {
+                that.setData({
+                    floorGoods: [...that.data.floorGoods, {
+                        name: '人气商品',
+                        goodsList: data
+                    }],
+                    loading: 1,
+                });
+            }
+            util.request(api.NewProductList).then(res => {
+                const { data, code } = res;
+                if (code === 200) {
+                    that.setData({
+                        floorGoods: [...that.data.floorGoods, {
+                            name: '新品推荐',
+                            goodsList: data
+                        }],
+                        loading: 1,
+                    });
+                }
+                util.request(api.RecommendProductList).then(res => {
+                    const { data, code } = res;
+                    if (code === 200) {
+                        that.setData({
+                            floorGoods: [...that.data.floorGoods, {
+                                name: '个性推荐',
+                                goodsList: data
+                            }],
+                            loading: 1,
+                        });
+                    }
+                })
+            })
+        })
+    },
     onLoad: function (options) {
-        this.getChannelShowInfo();
+        // this.getChannelShowInfo();
+        this.getIndexData();
+        this.getProductList();
     },
     onShow: function () {
-        this.getIndexData();
         var that = this;
         let userInfo = wx.getStorageSync('userInfo');
         if (userInfo != '') {
@@ -133,7 +175,7 @@ Page({
     onPullDownRefresh: function () {
         wx.showNavigationBarLoading()
         this.getIndexData();
-        this.getChannelShowInfo();
+        // this.getChannelShowInfo();
         wx.hideNavigationBarLoading() //完成停止加载
         wx.stopPullDownRefresh() //停止下拉刷新
     },
