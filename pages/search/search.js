@@ -32,7 +32,15 @@ Page({
             // searchStatus: false
         });
     },
-    onLoad: function () {
+    onLoad: function (options) {
+        const { name } = options;
+        if (name) {
+            this.setData({
+                keyword: name,
+                // searchStatus: false
+            });
+            this.getGoodsList();
+        }
         // this.getSearchKeyword();
     },
     onShow: function () {

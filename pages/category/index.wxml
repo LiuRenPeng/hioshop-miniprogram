@@ -20,7 +20,7 @@
                 </view>
                 <view class='list-wrap clearfix'>
                     <view class="goods-box {{(index+1)%2 == 0?'no-margin':''}}" wx:for="{{secondNavList}}" wx:for-index="index" wx:for-item="item" wx:key="id">
-                        <navigator hover-class='none' class='navi-url' url="/pages/goods/goods?id={{item.id}}">
+                        <navigator hover-class='none' class='navi-url' url="/pages/search/search?name={{item.name}}">
                             <view class="box">
                                 <image src="{{item.list_pic_url}}" class="image">
                                     <view wx:if="{{item.is_new == 1}}" class='new-tag'>新品</view>
