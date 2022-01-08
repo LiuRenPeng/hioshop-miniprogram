@@ -15,11 +15,11 @@ Page({
         })
     },
     getAddresses() {
-        let that = this;
-        util.request(api.GetAddresses).then(function(res) {
-            if (res.errno === 0) {
-                that.setData({
-                    addresses: res.data
+        util.request(api.GetAddresses).then((res) => {
+            const { data, code } = res;
+            if (code === 200) {
+                this.setData({
+                    addresses: data
                 })
             }
         });
@@ -52,7 +52,7 @@ Page({
     },
     addAddress: function() {
         wx.navigateTo({
-            url: '/pages/ucenter/address-detail/index?id=' + 0,
+            url: '/pages/ucenter/address-detail/index',
         })
     },
     onPullDownRefresh: function () {

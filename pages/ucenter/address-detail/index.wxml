@@ -13,7 +13,7 @@
                 <image class="img" src="/images/icon/mobile.png"></image>
             </view>
             <view class="input-wrap">
-                <input cursor-spacing='100' class='a-input' type='number' bindblur="mobilechange" value="{{address.mobile}}" placeholder='手机号码'></input>
+                <input cursor-spacing='100' class='a-input' type='number' bindblur="mobilechange" value="{{address.phoneNumber}}" placeholder='手机号码'></input>
             </view>
         </view>
         <view class="a-item">
@@ -30,7 +30,7 @@
                 <image class="img" src="/images/icon/address.png"></image>
             </view>
             <view class="input-wrap">
-                <input cursor-spacing='100' class="a-input" bindinput="bindinputAddress" value="{{address.address}}" placeholder="详细地址, 如街道、小区或写字楼等" />
+                <input cursor-spacing='100' class="a-input" bindinput="bindinputAddress" value="{{address.detailAddress}}" placeholder="详细地址, 如街道、小区或写字楼等" />
             </view>
         </view>
         <!-- <view class="a-item">
@@ -39,10 +39,10 @@
     </view>
     <view class="default-wrap">
         <view class="text">设为默认地址</view>
-        <switch class="switch" checked="{{address.is_default}}" bindchange="switchChange"></switch>
+        <switch class="switch" checked="{{address.defaultStatus}}" bindchange="switchChange"></switch>
     </view>
     <view class='btn-wrap' bindtap="saveAddress">
-        <view class="btn active}}">保存</view>
+        <view class="btn active">保存</view>
     </view>
     <view class='delete-wrap' wx:if="{{addressId > 0}}" bindtap='deleteAddress'>
         <view class='btn'>删除</view>
