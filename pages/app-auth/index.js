@@ -97,6 +97,15 @@ Page({
                     wx.navigateBack();
                 }
             }
+        }).catch(() => {
+            console.log('登录接口请求失败，用模拟账号token')
+            const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0IiwiY3JlYXRlZCI6MTY0MTYyNjQxNDM3NywiZXhwIjoxNjQyMjMxMjE0fQ.TOFiHfeh9jllJp8JuSa9nPOdhAcM5IsN1qNWTiYpxFexcGJynqb5oQSnfVOs47L-Bmik6fgFCiGP0QutIducPQ";
+            const userInfo = JSON.parse(info.rawData);
+            wx.setStorageSync('userInfo', userInfo);
+            wx.setStorageSync('token', token);
+            app.globalData.userInfo = userInfo;
+            app.globalData.token = token;
+            wx.navigateBack();
         });
     },
     goBack: function () {

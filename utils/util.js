@@ -85,7 +85,7 @@ function request(url, data = {}, method = "GET") {
             method: method,
             header: {
                 'Content-Type': 'application/json',
-                'X-Hioshop-Token': wx.getStorageSync('token')
+                'Authorization': `Bearer ${wx.getStorageSync('token')}`
             },
             success: function(res) {
                 if (res.statusCode == 200) {
