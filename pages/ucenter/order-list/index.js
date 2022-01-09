@@ -10,7 +10,7 @@ Page({
         allPage: 1,
         allCount: 0,
         size: 8,
-        showType: 9,
+        showType: -1,
         hasOrder: 0,
         showTips: 0,
         status: {}
@@ -36,43 +36,43 @@ Page({
                 size: 8
             });
             that.getOrderList();
-            that.getOrderInfo();
+            // that.getOrderInfo();
         }).catch(res => {
             util.showErrorToast(res.errmsg);
         });
     },
-    getOrderInfo: function(e) {
-        let that = this;
-        util.request(api.OrderCountInfo).then(function(res) {
-            if (res.errno === 0) {
-                let status = res.data;
-                that.setData({
-                    status: status
-                });
-            }
-        });
-    },
+    // getOrderInfo: function(e) {
+    //     util.request(api.OrderCountInfo).then((res) => {
+    //         if (res.code === 200) {
+    //             let status = res.data;
+    //             this.setData({
+    //                 status: status
+    //             });
+    //         }
+    //     });
+    // },
     getOrderList() {
-        let that = this;
         util.request(api.OrderList, {
-            showType: that.data.showType,
-            size: that.data.size,
-            page: that.data.allPage,
-        }).then(function(res) {
-            if (res.errno === 0) {
-                let count = res.data.count;
-                that.setData({
-                    allCount: count,
-                    allOrderList: that.data.allOrderList.concat(res.data.data),
-                    allPage: res.data.currentPage,
-                    orderList: that.data.allOrderList.concat(res.data.data)
-                });
-                let hasOrderData = that.data.allOrderList.concat(res.data.data);
-                if (count == 0) {
-                    that.setData({
-                        hasOrder: 1
-                    });
-                }
+            status: this.data.showType || -1,
+            pageSize: this.data.size,
+            pageNum: this.data.allPage,
+        }).then((res) => {
+            const { code, data } = res;
+            if (code === 200) {
+                console.log(data)
+                // let count = res.data.count;
+                // that.setData({
+                //     allCount: count,
+                //     allOrderList: that.data.allOrderList.concat(res.data.data),
+                //     allPage: res.data.currentPage,
+                //     orderList: that.data.allOrderList.concat(res.data.data)
+                // });
+                // let hasOrderData = that.data.allOrderList.concat(res.data.data);
+                // if (count == 0) {
+                //     that.setData({
+                //         hasOrder: 1
+                //     });
+                // }
             }
         });
     },
@@ -88,7 +88,7 @@ Page({
         let doRefresh = wx.getStorageSync('doRefresh');
         if (nowShowType != showType || doRefresh == 1) {
             this.setData({
-                showType: showType,
+                showType,
                 orderList: [],
                 allOrderList: [],
                 allPage: 1,
@@ -98,7 +98,7 @@ Page({
             this.getOrderList();
             wx.removeStorageSync('doRefresh');
         }
-        this.getOrderInfo();
+        // this.getOrderInfo();
     },
     switchTab: function(event) {
         let showType = event.currentTarget.dataset.index;
@@ -111,7 +111,7 @@ Page({
             allCount: 0,
             size: 8
         });
-        this.getOrderInfo();
+        // this.getOrderInfo();
         this.getOrderList();
     },
     // “取消订单”点击效果

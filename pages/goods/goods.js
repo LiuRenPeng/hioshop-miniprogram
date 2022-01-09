@@ -15,7 +15,7 @@ Page({
         skuStockList: [],
         checkedSku: {}, // 选择的sku数据
         productList: [],
-        cartGoodsCount: 0,
+        cartGoodsCount: 0, // 购物车里商品数量
         checkedSpecPrice: 0,
         number: 1,
         checkedSpecText: '请选择规格和数量', // 规格和数量选中文本
@@ -305,11 +305,12 @@ Page({
         });
     },
     // 查询购物车数量
-    getCartNumber() {
+    getCartNumber(callback) {
         util.request(api.CartList).then((res) => {
             const { data, code } = res;
             if (code === 200) {
                 this.setData({ cartGoodsCount: data.length })
+                callback && callback(data);
             }
         })
     },
@@ -317,7 +318,7 @@ Page({
     addToCart() {
         if(this.checkLogin() && this.checkSku()) {
             const { skuStockList, openAttr } = this.data;
-            this.fetchAddCart((data) => {
+            this.fetchAddCart(() => {
                 wx.showToast({
                     title: '添加成功',
                 });
@@ -333,19 +334,15 @@ Page({
     // 立即购买
     fastToCart() {
         if (this.checkLogin() && this.checkSku()) {
-            this.fetchAddCart((data) => {
-                if (data) {
-                    console.log(data);
-                    let id = this.data.id;
+            this.fetchAddCart(() => {
+                this.getCartNumber((cartList) => {
+                    const { checkedSku } = this.data;
+                    const { skuCode } = checkedSku;
+                    const cartId = cartList.find(item => item.productSkuCode === skuCode).id;
                     wx.navigateTo({
-                        url: '/pages/order-check/index?addtype=1'
+                        url: `/pages/order-check/index?cartIds=${cartId}`
                     });
-                } else {
-                    wx.showToast({
-                        image: '/images/icon/icon_error.png',
-                        title: _res.errmsg,
-                    });
-                }
+                });
             });
         }
     },

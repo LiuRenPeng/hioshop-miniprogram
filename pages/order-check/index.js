@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
     data: {
+        cartIds: [],
         checkedGoodsList: [],
         checkedAddress: {},
         goodsTotalPrice: 0.00, //商品总价
@@ -62,17 +63,10 @@ Page({
         });
     },
     onLoad: function (options) {
-        let addType = options.addtype;
-        let orderFrom = options.orderFrom;
-        if (addType != undefined) {
-            this.setData({
-                addType: addType
-            })
-        }
-        if (orderFrom != undefined) {
-            this.setData({
-                orderFrom: orderFrom
-            })
+        console.log('确认订单：', options.cartIds)
+        const { cartIds } = options;
+        if (cartIds) {
+            this.setData({ cartIds })
         }
     },
     onUnload: function () {
@@ -83,12 +77,11 @@ Page({
         // TODO结算时，显示默认地址，而不是从storage中获取的地址值
         try {
             var addressId = wx.getStorageSync('addressId');
+            console.log('addressId:', addressId);
             if (addressId == 0 || addressId == '') {
                 addressId = 0;
             }
-            this.setData({
-                'addressId': addressId
-            });
+            this.setData({ addressId });
         } catch (e) {}
         this.getCheckoutInfo();
     },
@@ -110,39 +103,33 @@ Page({
         wx.stopPullDownRefresh() //停止下拉刷新
     },
     getCheckoutInfo: function () {
-        let that = this;
-        let addressId = that.data.addressId;
-        let orderFrom = that.data.orderFrom;
-        let addType = that.data.addType;
-        util.request(api.CartCheckout, {
-            addressId: addressId,
-            addType: addType,
-            orderFrom: orderFrom,
-            type: 0
-        }).then(function (res) {
-            if (res.errno === 0) {
-                let addressId = 0;
-                if (res.data.checkedAddress != 0) {
-                    addressId = res.data.checkedAddress.id;
-                }
-                that.setData({
-                    checkedGoodsList: res.data.checkedGoodsList,
-                    checkedAddress: res.data.checkedAddress,
-                    actualPrice: res.data.actualPrice,
-                    addressId: addressId,
-                    freightPrice: res.data.freightPrice,
-                    goodsTotalPrice: res.data.goodsTotalPrice,
-                    orderTotalPrice: res.data.orderTotalPrice,
-                    goodsCount: res.data.goodsCount,
-                    outStock: res.data.outStock
-                });
-                let goods = res.data.checkedGoodsList;
-                wx.setStorageSync('addressId', addressId);
-                if (res.data.outStock == 1) {
-                    util.showErrorToast('有部分商品缺货或已下架');
-                } else if (res.data.numberChange == 1) {
-                    util.showErrorToast('部分商品库存有变动');
-                }
+        const { cartIds } = this.data;
+        util.request(api.CartCheckout, { cartIds }, 'post').then((res) => {
+            const { code, data } = res;
+            if (code === 200) {
+                console.log(data);
+                // let addressId = 0;
+                // if (res.data.checkedAddress != 0) {
+                //     addressId = res.data.checkedAddress.id;
+                // }
+                // that.setData({
+                //     checkedGoodsList: res.data.checkedGoodsList,
+                //     checkedAddress: res.data.checkedAddress,
+                //     actualPrice: res.data.actualPrice,
+                //     addressId: addressId,
+                //     freightPrice: res.data.freightPrice,
+                //     goodsTotalPrice: res.data.goodsTotalPrice,
+                //     orderTotalPrice: res.data.orderTotalPrice,
+                //     goodsCount: res.data.goodsCount,
+                //     outStock: res.data.outStock
+                // });
+                // let goods = res.data.checkedGoodsList;
+                // wx.setStorageSync('addressId', addressId);
+                // if (res.data.outStock == 1) {
+                //     util.showErrorToast('有部分商品缺货或已下架');
+                // } else if (res.data.numberChange == 1) {
+                //     util.showErrorToast('部分商品库存有变动');
+                // }
             }
         });
     },

@@ -157,19 +157,13 @@ Page({
     checkoutOrder: function() {
         //获取已选择的商品
         util.loginNow();
-        var checkedGoods = this.data.cartGoods.filter(function(element, index, array) {
-            if (element.checked == true) {
-                return true;
-            } else {
-                return false;
-            }
-        });
+        var checkedGoods = this.data.cartGoods.filter(item => item.checked);
         if (checkedGoods.length <= 0) {
             util.showErrorToast('请先选择要结算的商品');
             return false;
         }
         wx.navigateTo({
-            url: '/pages/order-check/index?addtype=0'
+            url: `/pages/order-check/index?cartIds=${checkedGoods.map(item => item.id)}`
         })
     },
     checkedItem: function(e) {

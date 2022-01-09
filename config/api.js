@@ -19,7 +19,7 @@ module.exports = {
     CartDelete: ApiRootUrl + '/cart/delete', // 删除购物车的商品
     CartChecked: ApiRootUrl + 'cart/checked', // 选择或取消选择商品
     CartGoodsCount: ApiRootUrl + 'cart/goodsCount', // 获取购物车商品件数
-    CartCheckout: ApiRootUrl + 'cart/checkout', // 下单前信息确认
+    CartCheckout: ApiRootUrl + '/order/generateConfirmOrder', // 从购物车生成确认订单
     // 商品
     GoodsCount: ApiRootUrl + 'goods/count', //统计商品总数
     GoodsDetail: ApiRootUrl + '/product/detail/{id}', //获得商品的详情
@@ -36,12 +36,12 @@ module.exports = {
     // 订单
     PayPrepayId: ApiRootUrl + 'pay/preWeixinPay', //获取微信统一下单prepay_id
     OrderSubmit: ApiRootUrl + 'order/submit', // 提交订单
-    OrderList: ApiRootUrl + 'order/list', //订单列表
-    OrderDetail: ApiRootUrl + 'order/detail', //订单详情
-    OrderDelete: ApiRootUrl + 'order/delete', //订单删除
-    OrderCancel: ApiRootUrl + 'order/cancel', //取消订单
+    OrderList: ApiRootUrl + '/order/list', //订单列表
+    OrderDetail: ApiRootUrl + '/order/detail/{orderId}', //订单详情
+    OrderDelete: ApiRootUrl + '/order/deleteOrder', //订单删除
+    OrderCancel: ApiRootUrl + '/order/cancelUserOrder', //取消订单
     OrderConfirm: ApiRootUrl + 'order/confirm', //物流详情
-    OrderCount: ApiRootUrl + 'order/count', // 获取订单数
+    // OrderCount: ApiRootUrl + 'order/count', // 获取订单数
     OrderCountInfo: ApiRootUrl + 'order/orderCount', // 我的页面获取订单数状态
     OrderExpressInfo: ApiRootUrl + 'order/express', //物流信息
     OrderGoods: ApiRootUrl + 'order/orderGoods', // 获取checkout页面的商品列表

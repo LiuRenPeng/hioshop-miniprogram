@@ -24,7 +24,7 @@ Page({
     toOrderListTap: function(event) {
         let res = util.loginNow();
         if (res == true) {
-            let showType = event.currentTarget.dataset.index;
+            const { showType } = event.currentTarget.dataset;
             wx.setStorageSync('showType', showType);
             wx.navigateTo({
                 url: '/pages/ucenter/order-list/index?showType=' + showType,
@@ -74,25 +74,26 @@ Page({
         this.setData({
             userInfo: userInfo,
         });
-        this.getOrderInfo();
+        // this.getOrderInfo();
         wx.removeStorageSync('categoryId');
     },
 
     onPullDownRefresh: function() {
         wx.showNavigationBarLoading()
-        this.getOrderInfo();
+        // this.getOrderInfo();
         wx.hideNavigationBarLoading() //完成停止加载
         wx.stopPullDownRefresh() //停止下拉刷新
     },
-    getOrderInfo: function(e) {
-        let that = this;
-        util.request(api.OrderCountInfo).then(function(res) {
-            if (res.errno === 0) {
-                let status = res.data;
-                that.setData({
-                    status: status
-                });
-            }
-        });
-    },
+    // getOrderInfo: function(e) {
+    //     util.request(api.OrderCountInfo).then((res) => {
+    //         const { code, data } = res;
+    //         if (code === 200) {
+    //             console.log(data)
+    //             let status = res.data;
+    //             that.setData({
+    //                 status: status
+    //             });
+    //         }
+    //     });
+    // },
 })
