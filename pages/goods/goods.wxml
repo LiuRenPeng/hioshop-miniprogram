@@ -89,7 +89,7 @@
                 <view class='spec-item'>
                     <view class='name'>规格:</view>
                     <view class="values">
-                        <view class="value {{checkedSkuCode === item.skuCode ? 'selected' : ''}} {{item.stock <=0?'out-stock':''}}" 
+                        <view class="value {{checkedSku.skuCode === item.skuCode ? 'selected' : ''}} {{item.stock <=0?'out-stock':''}}" 
                             bindtap="clickSkuValue" 
                             data-sku-code="{{item.skuCode}}"
                             wx:for="{{skuStockList}}"
@@ -105,9 +105,9 @@
                 <view class="number-item">
                     <view class="name">数量: ({{goods.unit}})</view>
                     <view class="selnum">
-                        <button class="cut" bindtap="cutNumber">-</button>
+                        <button class="cut" bindtap="cutNumber" disabled='{{cutDisabled}}'>-</button>
                         <input value="{{number}}" class="number" type="number" cursor-spacing="100" bindblur="inputNumber" />
-                        <button class="add" bindtap="addNumber" disabled='{{disabled}}'>+</button>
+                        <button class="add" bindtap="addNumber" >+</button>
                     </view>
                 </view>
             </view>

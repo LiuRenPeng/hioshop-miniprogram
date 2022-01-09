@@ -13,7 +13,7 @@ module.exports = {
     CatalogCurrent: ApiRootUrl + 'catalog/current', //分类目录当前分类数据接口
     GetCurrentList: ApiRootUrl + 'catalog/currentlist',
     // 购物车
-    CartAdd: ApiRootUrl + 'cart/add', // 添加商品到购物车
+    CartAdd: ApiRootUrl + '/cart/add', // 添加商品到购物车
     CartList: ApiRootUrl + '/cart/list', //获取购物车的数据
     CartUpdate: ApiRootUrl + 'cart/update', // 更新购物车的商品
     CartDelete: ApiRootUrl + 'cart/delete', // 删除购物车的商品

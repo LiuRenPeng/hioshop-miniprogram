@@ -69,27 +69,33 @@ Page({
         });
     },
     getIndexData: function () {
-        let that = this;
-        util.request(api.IndexUrl).then(function (res) {
-            if (res.code === 200) {
-                const { data } = res;
-                that.setData({
+        util.request(api.IndexUrl).then((res) => {
+            const { data, code } = res;
+            if (code === 200) {
+                this.setData({
                     // floorGoods: data.categoryList,
                     banner: data.advertiseList,
                     channel: data.channel,
                     // notice: data.notice,
                     loading: 1,
                 });
-                let cartGoodsCount = '';
-                if (res.data.cartCount == 0) {
+            }
+            this.getCartNumber();
+        });
+    },
+    getCartNumber: function () {
+        util.request(api.CartList).then((res) => {
+            const { data, code } = res;
+            if (code === 200) {
+                const cartCount = data.length;
+                if (cartCount == 0) {
                     wx.removeTabBarBadge({
                         index: 2,
                     })
                 } else {
-                    cartGoodsCount = res.data.cartCount + '';
                     wx.setTabBarBadge({
                         index: 2,
-                        text: cartGoodsCount
+                        text: cartCount + ''
                     })
                 }
             }
