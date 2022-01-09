@@ -2,38 +2,41 @@
 	<view class="goodsList" wx:if="{{cartGoods.length > 0}}">
 		<view class="a-goods {{item.isTouchMove ? 'touch-move-active' : ''}}" wx:for="{{cartGoods}}" wx:key="id" bindtouchstart="touchstart" bindtouchmove="touchmove" data-index="{{index}}">
 			<view class='content'>
-				<view wx:if="{{item.number >0 && item.is_on_sale == 1}}" class="checkbox" bindtap="checkedItem" data-item-index="{{index}}">
+				<!-- <view wx:if="{{item.quantity >0 && item.is_on_sale == 1}}" class="checkbox" bindtap="checkedItem" data-item-id="{{item.id}}"> -->
+				<view wx:if="{{item.quantity >0}}" class="checkbox" bindtap="checkedItem" data-item-id="{{item.id}}">
 					<image wx:if="{{item.checked == 1}}" class="checkbox-img" src="/images/icon/gou-red.png"></image>
 					<image wx:else class="checkbox-img" src="/images/icon/gou-gray.png"></image>
 				</view>
 				<image src="/images/icon/gou-gray.png" wx:else class="checkbox"></image>
 				<view class="goods-info">
 					<view class="goods-url">
-						<view class="img-box" bindtap="goGoodsDetail" data-goodsid="{{item.goods_id}}">
-							<image src="{{item.list_pic_url}}" class="img" />
+						<view class="img-box" bindtap="goGoodsDetail" data-product-id="{{item.productId}}">
+							<image src="{{item.productPic}}" class="img" />
 						</view>
 						<view class="text-box">
-							<view class="{{item.number >0 && item.is_on_sale == 1?'goods-title':'out-stock-title'}}">{{item.goods_name}}</view>
-							<view class="goods-label">{{item.goods_specifition_name_value}}</view>
+							<!-- <view class="{{item.quantity >0 && item.is_on_sale == 1?'goods-title':'out-stock-title'}}">{{item.productName}}</view> -->
+							<view class="{{item.quantity >0?'goods-title':'out-stock-title'}}">{{item.productName}}</view>
+							<view class="goods-label">{{item.productAttr}}</view>
 							<view class="goods-price">
-								<view class='price-now'>￥{{item.retail_price}}</view>
+								<view class='price-now'>￥{{item.price}}</view>
 							</view>
-							<view class="selnum" catchtap="nothing" wx:if="{{item.number > 0 && item.is_on_sale == 1}}">
-								<view data-item-index="{{index}}" class="cut" catchtap="cutNumber">-</view>
-								<input value="{{item.number}}" class="number" disabled="true" type="number" />
-								<view data-item-index="{{index}}" class="add" catchtap="addNumber" disabled='{{disabled}}'>+</view>
+							<!-- <view class="selnum" catchtap="nothing" wx:if="{{item.quantity > 0 && item.is_on_sale == 1}}"> -->
+							<view class="selnum" catchtap="nothing" wx:if="{{item.quantity > 0}}">
+								<view data-item-id="{{item.id}}" class="cut" catchtap="cutNumber" disabled='{{item.quantity === 1}}'>-</view>
+								<input value="{{item.quantity}}" class="number" disabled="true" type="number" />
+								<view data-item-id="{{item.id}}" class="add" catchtap="addNumber">+</view>
 							</view>
 							<view wx:else class="out-stock">暂时缺货</view>
 						</view>
 					</view>
 				</view>
 			</view>
-			<view class="delete-btn" data-item-index="{{index}}" catchtap="deleteGoods">
+			<view class="delete-btn" data-item-id="{{item.id}}" catchtap="deleteGoods">
 				删除
 			</view>
 		</view>
 	</view>
-	<view class="cart-empty-container {{hasCartGoods == 0?'show':''}}">
+	<view class="cart-empty-container {{cartGoods.length === 0?'show':''}}">
 		<view class='cart-empty-view'>
 			<image class='cart-empty' src='/images/icon/cart-empty.png'></image>
 		</view>

@@ -79,6 +79,16 @@ function request(url, data = {}, method = "GET") {
                 url = url + value + '/'
             })
         }
+        // 处理post请求，把参数拼在url上
+        if(method.toLocaleLowerCase() === 'post') {
+            if(data) {
+                const keys = Object.keys(data);
+                keys.forEach((key, i) => {
+                    const symbol = i === 0 ? '?' : '&';
+                    url = `${url}${symbol}${key}=${data[key]}`;
+                })
+            }
+        }
         wx.request({
             url: url,
             data: data,

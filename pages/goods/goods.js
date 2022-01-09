@@ -92,8 +92,6 @@ Page({
         }
     },
     onUnload: function() {},
-    handleTap: function(event) { //阻止冒泡 
-    },
     getGoodsInfo: function() {
         let that = this;
         const { id } = this.data;
@@ -189,6 +187,7 @@ Page({
             sysHeight: sysHeight
         })
         this.getGoodsInfo();
+        this.getCartNumber();
     },
     onHide:function(){
         this.setData({
@@ -270,7 +269,7 @@ Page({
           mask: true
         })
         const { goods, checkedSku, number, gallery } = this.data;
-        const { price, productId, skuCode, spData } = checkedSku;
+        const { price, productId, skuCode, skuValue } = checkedSku;
         const cartItem = {
             // createDate: "2022-01-09T02:29:01.166Z",
             // deleteStatus: 0,
@@ -279,7 +278,7 @@ Page({
             // memberNickname: "string",
             // modifyDate: "2022-01-09T02:29:01.166Z",
             price,
-            productAttr: spData,
+            productAttr: skuValue,
             productBrand: goods.brandName,
             productCategoryId: goods.productCategoryId,
             productId,
@@ -292,18 +291,27 @@ Page({
             quantity: number
         }
         util.request(api.CartAdd, { ...cartItem }, "POST")
-            .then((res) => {
-                wx.hideLoading()
-                const { code, data } = res;
-                if (code === 200) {
-                    callback(data);
-                } else {
-                    wx.showToast({
-                        image: '/images/icon/icon_error.png',
-                        title: res.message,
-                    });
-                }
-            });
+        .then((res) => {
+            wx.hideLoading()
+            const { code, data } = res;
+            if (code === 200) {
+                callback(data);
+            } else {
+                wx.showToast({
+                    image: '/images/icon/icon_error.png',
+                    title: res.message,
+                });
+            }
+        });
+    },
+    // 查询购物车数量
+    getCartNumber() {
+        util.request(api.CartList).then((res) => {
+            const { data, code } = res;
+            if (code === 200) {
+                this.setData({ cartGoodsCount: data.length })
+            }
+        })
     },
     // 加入购物车
     addToCart() {
@@ -315,14 +323,10 @@ Page({
                 });
                 if (skuStockList.length != 1 || openAttr == true) {
                     this.setData({
-                        openAttr: !openAttr,
-                        cartGoodsCount: _res.data.cartTotal.goodsCount
-                    });
-                } else {
-                    this.setData({
-                        cartGoodsCount: _res.data.cartTotal.goodsCount
+                        openAttr: !openAttr
                     });
                 }
+                this.getCartNumber();
             });
         }
     },
