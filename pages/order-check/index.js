@@ -8,21 +8,18 @@ Page({
         cartIds: [],
         checkedGoodsList: [],
         checkedAddress: {},
-        goodsTotalPrice: 0.00, //商品总价
-        freightPrice: 0.00, //快递费
-        orderTotalPrice: 0.00, //订单总价
-        actualPrice: 0.00, //实际需要支付的总价
+        // goodsTotalPrice: 0.00, //商品总价
+        // freightPrice: 0.00, //快递费
+        // orderTotalPrice: 0.00, //订单总价
+        // actualPrice: 0.00, //实际需要支付的总价
         addressId: 0,
         goodsCount: 0,
         postscript: '',
         outStock: 0,
-        payMethodItems: [{
-                name: 'offline',
-                value: '线下支付'
-            },
+        payMethodItems: [
             {
                 name: 'online',
-                value: '在线支付',
+                value: '微信支付',
                 checked: 'true'
             },
         ],
@@ -42,9 +39,9 @@ Page({
         }
     },
     toGoodsList: function (e) {
-        wx.navigateTo({
-            url: '/pages/ucenter/goods-list/index?id=0',
-        });
+        // wx.navigateTo({
+        //     url: '/pages/ucenter/goods-list/index?id=0',
+        // });
     },
     toSelectAddress: function () {
         wx.navigateTo({
@@ -63,7 +60,7 @@ Page({
         });
     },
     onLoad: function (options) {
-        console.log('确认订单：', options.cartIds)
+        // console.log('确认订单：', options.cartIds)
         const { cartIds } = options;
         if (cartIds) {
             this.setData({ cartIds: cartIds.split(',').map(item => Number(item)) })
@@ -77,7 +74,7 @@ Page({
         // TODO结算时，显示默认地址，而不是从storage中获取的地址值
         try {
             var addressId = wx.getStorageSync('addressId');
-            console.log('addressId:', addressId);
+            // console.log('addressId:', addressId);
             if (addressId == 0 || addressId == '') {
                 addressId = 0;
             }
@@ -107,16 +104,28 @@ Page({
         util.request(api.CartCheckout, cartIds, 'post').then((res) => {
             const { code, data } = res;
             if (code === 200) {
-                console.log(data);
-                const { memberReceiveAddressList } = data;
+                // console.log(data);
+                const { memberReceiveAddressList, cartPromotionItemList, calcAmount } = data;
                 let checkedAddress = ''
                 if(addressId){
                     checkedAddress = memberReceiveAddressList.find(item => item.id === addressId);
                 } else {
                     checkedAddress = memberReceiveAddressList.find(item => item.defaultStatus);
+                    this.setData({
+                        addressId: checkedAddress.id
+                    })
+                    wx.setStorageSync('addressId', checkedAddress.id);
                 }
                 this.setData({
-                    checkedAddress
+                    checkedAddress,
+                    checkedGoodsList: cartPromotionItemList,
+                    goodsCount: cartPromotionItemList.reduce((pre,cur) => {
+                        return pre + cur.quantity
+                    }, 0),
+                    calcAmount: calcAmount,
+                    // goodsTotalPrice: calcAmount.totalAmount,
+                    // orderTotalPrice: calcAmount.totalAmount +  calcAmount.freightAmount,
+                    // actualPrice: calcAmount.totalAmount +  calcAmount.freightAmount,
                 })
                 // let addressId = 0;
                 // if (res.data.checkedAddress != 0) {
@@ -145,29 +154,31 @@ Page({
     },
     // TODO 有个bug，用户没选择地址，支付无法继续进行，在切换过token的情况下
     submitOrder: function (e) {
-        if (this.data.addressId <= 0) {
+        const { addressId, cartIds } = this.data;
+        if (addressId <= 0) {
             util.showErrorToast('请选择收货地址');
             return false;
         }
-        let addressId = this.data.addressId;
-        let postscript = this.data.postscript;
-        let freightPrice = this.data.freightPrice;
-        let actualPrice = this.data.actualPrice;
         wx.showLoading({
             title: '',
             mask:true
         })
-        util.request(api.OrderSubmit, {
-            addressId: addressId,
-            postscript: postscript,
-            freightPrice: freightPrice,
-            actualPrice: actualPrice,
-            offlinePay: 0
-        }, 'POST').then(res => {
-            if (res.errno === 0) {
+        const params = {
+            cartIds,
+            // "couponId": 0,
+            memberReceiveAddressId: addressId,
+            payType: 2,
+            useIntegration: 0
+        }
+        util.request(api.OrderSubmit, params, 'POST').then(res => {
+            wx.hideLoading()
+            const { code, data } = res;
+            if (code === 200) {
+                const { order } = data;
                 wx.removeStorageSync('orderId');
                 wx.setStorageSync('addressId', 0);
-                const orderId = res.data.orderInfo.id;
+                const orderId = order.id;
+                // 待处理：调用微信支付接口
                 pay.payOrder(parseInt(orderId)).then(res => {
                     wx.redirectTo({
                         url: '/pages/payResult/payResult?status=1&orderId=' + orderId
@@ -180,37 +191,37 @@ Page({
             } else {
                 util.showErrorToast(res.errmsg);
             }
-            wx.hideLoading()
+            
         });
     },
-    offlineOrder: function (e) {
-        if (this.data.addressId <= 0) {
-            util.showErrorToast('请选择收货地址');
-            return false;
-        }
-        let addressId = this.data.addressId;
-        let postscript = this.data.postscript;
-        let freightPrice = this.data.freightPrice;
-        let actualPrice = this.data.actualPrice;
-        util.request(api.OrderSubmit, {
-            addressId: addressId,
-            postscript: postscript,
-            freightPrice: freightPrice,
-            actualPrice: actualPrice,
-            offlinePay: 1
-        }, 'POST').then(res => {
-            if (res.errno === 0) {
-                wx.removeStorageSync('orderId');
-                wx.setStorageSync('addressId', 0);
-                wx.redirectTo({
-                    url: '/pages/payOffline/index?status=1',
-                })
-            } else {
-                util.showErrorToast(res.errmsg);
-                wx.redirectTo({
-                    url: '/pages/payOffline/index?status=0',
-                })
-            }
-        });
-    }
+    // offlineOrder: function (e) {
+    //     if (this.data.addressId <= 0) {
+    //         util.showErrorToast('请选择收货地址');
+    //         return false;
+    //     }
+    //     let addressId = this.data.addressId;
+    //     let postscript = this.data.postscript;
+    //     let freightPrice = this.data.freightPrice;
+    //     let actualPrice = this.data.actualPrice;
+    //     util.request(api.OrderSubmit, {
+    //         addressId: addressId,
+    //         postscript: postscript,
+    //         freightPrice: freightPrice,
+    //         actualPrice: actualPrice,
+    //         offlinePay: 1
+    //     }, 'POST').then(res => {
+    //         if (res.errno === 0) {
+    //             wx.removeStorageSync('orderId');
+    //             wx.setStorageSync('addressId', 0);
+    //             wx.redirectTo({
+    //                 url: '/pages/payOffline/index?status=1',
+    //             })
+    //         } else {
+    //             util.showErrorToast(res.errmsg);
+    //             wx.redirectTo({
+    //                 url: '/pages/payOffline/index?status=0',
+    //             })
+    //         }
+    //     });
+    // }
 })

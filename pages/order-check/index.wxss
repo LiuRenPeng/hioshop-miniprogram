@@ -201,7 +201,7 @@ page {
 }
 
 .row-label {
-    width: 140rpx;
+    min-width: 80rpx;
     font-size: 28rpx;
     color: #000;
 }
