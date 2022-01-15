@@ -66,7 +66,7 @@ function testMobile(num) {
 /**
  * 封装微信的的request
  */
-function request(url, data = {}, method = "GET") {
+function request(url, data = {}, method = "GET", type = "body") {
     return new Promise(function(resolve, reject) {
         if(url.includes('{')){
             const reg = /\{(.+?)\}/g;
@@ -80,7 +80,7 @@ function request(url, data = {}, method = "GET") {
             })
         }
         // 处理post请求，把参数拼在url上
-        if(method.toLocaleLowerCase() === 'post') {
+        if(method.toLocaleLowerCase() === 'post' && type === 'query') {
             if(data) {
                 const keys = Object.keys(data);
                 keys.forEach((key, i) => {

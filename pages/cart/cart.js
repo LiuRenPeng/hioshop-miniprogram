@@ -163,7 +163,7 @@ Page({
             return false;
         }
         wx.navigateTo({
-            url: `/pages/order-check/index?cartIds=${checkedGoods.map(item => item.id)}`
+            url: `/pages/order-check/index?cartIds=${checkedGoods.map(item => item.productSkuId)}`
         })
     },
     checkedItem: function(e) {
@@ -238,7 +238,7 @@ Page({
         const { itemId } = e.currentTarget.dataset;
         util.request(api.CartDelete, {
             ids : itemId
-        }, 'POST').then((res) => {
+        }, 'POST', 'query').then((res) => {
             const { code, data } = res;
             if (code === 200) {
                 console.log(data);

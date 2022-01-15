@@ -66,7 +66,7 @@ Page({
         console.log('确认订单：', options.cartIds)
         const { cartIds } = options;
         if (cartIds) {
-            this.setData({ cartIds })
+            this.setData({ cartIds: cartIds.split(',').map(item => Number(item)) })
         }
     },
     onUnload: function () {
@@ -103,11 +103,21 @@ Page({
         wx.stopPullDownRefresh() //停止下拉刷新
     },
     getCheckoutInfo: function () {
-        const { cartIds } = this.data;
-        util.request(api.CartCheckout, { cartIds }, 'post').then((res) => {
+        const { cartIds, addressId } = this.data;
+        util.request(api.CartCheckout, cartIds, 'post').then((res) => {
             const { code, data } = res;
             if (code === 200) {
                 console.log(data);
+                const { memberReceiveAddressList } = data;
+                let checkedAddress = ''
+                if(addressId){
+                    checkedAddress = memberReceiveAddressList.find(item => item.id === addressId);
+                } else {
+                    checkedAddress = memberReceiveAddressList.find(item => item.defaultStatus);
+                }
+                this.setData({
+                    checkedAddress
+                })
                 // let addressId = 0;
                 // if (res.data.checkedAddress != 0) {
                 //     addressId = res.data.checkedAddress.id;

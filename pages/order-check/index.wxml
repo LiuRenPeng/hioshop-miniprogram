@@ -8,9 +8,9 @@
 					<view class="show-address">
 						<view class="name-tel">
 							<view wx:if="{{checkedAddress.is_default}}" class='default-address'>默认</view>
-							{{checkedAddress.name}} {{checkedAddress.mobile}}
+							{{checkedAddress.name}} {{checkedAddress.phoneNumber}}
 						</view>
-						<view class="addr-text">{{checkedAddress.full_region + checkedAddress.address}}</view>
+						<view class="addr-text">{{checkedAddress.province + checkedAddress.city + checkedAddress.region + checkedAddress.detailAddress}}</view>
 					</view>
 					<view class="arrow"></view>
 				</view>

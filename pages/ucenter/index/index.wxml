@@ -103,11 +103,11 @@
             <view class="arrow"></view>
         </view>
     </view>
-    <view class="company">
+    <!-- <view class="company">
         <view class="c-wrap" bindtap="getOrderInfo">
             <view class="text">海风小店</view>
             <view class="line"></view>
         </view>
         <view class="tip">开源微信小程序商城</view>
-    </view>
+    </view> -->
 </view>

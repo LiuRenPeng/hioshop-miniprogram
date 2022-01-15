@@ -269,7 +269,7 @@ Page({
           mask: true
         })
         const { goods, checkedSku, number, gallery } = this.data;
-        const { price, productId, skuCode, skuValue } = checkedSku;
+        const { id, price, productId, skuCode, skuValue } = checkedSku;        console.log(checkedSku.id)
         const cartItem = {
             // createDate: "2022-01-09T02:29:01.166Z",
             // deleteStatus: 0,
@@ -285,7 +285,7 @@ Page({
             productName: goods.name,
             productPic: gallery[0],
             productSkuCode: skuCode,
-            productSkuId: skuCode,
+            productSkuId: id,
             productSn: goods.productSn,
             productSubTitle: goods.subTitle,
             quantity: number
