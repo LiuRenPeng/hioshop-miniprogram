@@ -130,6 +130,15 @@ Page({
                     WxParse.wxParse('goodsDetail', 'html', product.detailHtml || '暂无详情', that);
                 }, 300);
                 wx.setStorageSync('goodsImage', product.pic);
+                // 创建浏览记录
+                const params = {
+                    "productId": product.id,
+                    "productName": product.name,
+                    "productPic": product.pic,
+                    "productPrice": product.price,
+                    "productSubTitle": product.subTitle
+                }
+                util.request(api.FootprintCreate, params, 'post');
             }
             else{
                 util.showErrorToast(res.errmsg)
