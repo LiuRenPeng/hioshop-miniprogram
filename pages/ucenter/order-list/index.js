@@ -3,17 +3,25 @@ var api = require('../../../config/api.js');
 const pay = require('../../../services/pay.js');
 const app = getApp()
 // 触底上拉刷新 TODO 这里要将page传给服务器，作者没写
+
+// 订单状态
+const STATUS_MAP = {
+    '0': '待付款',
+    '1': '待发货',
+    '2': '待收货',
+    '3': '已完成',
+    '4': '已关闭'
+}
 Page({
     data: {
         orderList: [],
         allOrderList: [],
-        allPage: 1,
-        allCount: 0,
-        size: 8,
+        pageNum: 1,
+        totalPage: 1,
+        pageSize: 10,
         showType: -1,
-        hasOrder: 0,
         showTips: 0,
-        status: {}
+        status: {} // 各个状态的订单数量，暂未使用
     },
     toOrderDetails: function(e) {
         let orderId = e.currentTarget.dataset.id;
@@ -31,9 +39,8 @@ Page({
                 showType: showType,
                 orderList: [],
                 allOrderList: [],
-                allPage: 1,
-                allCount: 0,
-                size: 8
+                pageNum: 1,
+                pageSize: 10
             });
             that.getOrderList();
             // that.getOrderInfo();
@@ -52,27 +59,22 @@ Page({
     //     });
     // },
     getOrderList() {
+        const { showType, pageSize, pageNum, orderList } = this.data;
         util.request(api.OrderList, {
-            status: this.data.showType || -1,
-            pageSize: this.data.size,
-            pageNum: this.data.allPage,
+            status: showType || -1,
+            pageSize,
+            pageNum
         }).then((res) => {
             const { code, data } = res;
             if (code === 200) {
-                console.log(data)
-                // let count = res.data.count;
-                // that.setData({
-                //     allCount: count,
-                //     allOrderList: that.data.allOrderList.concat(res.data.data),
-                //     allPage: res.data.currentPage,
-                //     orderList: that.data.allOrderList.concat(res.data.data)
-                // });
-                // let hasOrderData = that.data.allOrderList.concat(res.data.data);
-                // if (count == 0) {
-                //     that.setData({
-                //         hasOrder: 1
-                //     });
-                // }
+                const { totalPage, list } = data;
+                this.setData({
+                    totalPage,
+                    orderList: orderList.concat(list.map(item => ({
+                        ...item,
+                        statusName: STATUS_MAP[item.status]
+                    })))
+                })
             }
         });
     },
@@ -91,13 +93,13 @@ Page({
                 showType,
                 orderList: [],
                 allOrderList: [],
-                allPage: 1,
-                allCount: 0,
-                size: 8
+                pageNum: 1,
+                pageSize: 10
             });
-            this.getOrderList();
+            // this.getOrderList();
             wx.removeStorageSync('doRefresh');
         }
+        this.getOrderList();
         // this.getOrderInfo();
     },
     switchTab: function(event) {
@@ -107,9 +109,8 @@ Page({
             showType: showType,
             orderList: [],
             allOrderList: [],
-            allPage: 1,
-            allCount: 0,
-            size: 8
+            pageNum: 1,
+            pageSize: 10
         });
         // this.getOrderInfo();
         this.getOrderList();
@@ -133,9 +134,8 @@ Page({
                             that.setData({
                                 orderList: [],
                                 allOrderList: [],
-                                allPage: 1,
-                                allCount: 0,
-                                size: 8
+                                pageNum: 1,
+                                pageSize: 10
                             });
                             that.getOrderList();
                         } else {
@@ -147,16 +147,16 @@ Page({
         });
     },
     onReachBottom: function() {
-        let that = this;
-        if (that.data.allCount / that.data.size < that.data.allPage) {
-            that.setData({
+        const { pageNum, totalPage } = this.data;
+        if (pageNum === totalPage) {
+            this.setData({
                 showTips: 1
             });
             return false;
         }
-        that.setData({
-            'allPage': that.data.allPage + 1
+        this.setData({
+            pageNum: pageNum + 1
         });
-        that.getOrderList();
+        this.getOrderList();
     }
 })

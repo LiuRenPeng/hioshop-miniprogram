@@ -4,7 +4,14 @@ var timer = require('../../../utils/wxTimer.js');
 var remaintimer = require('../../../utils/remainTime.js');
 const pay = require('../../../services/pay.js');
 const app = getApp()
-
+// 订单状态
+const STATUS_MAP = {
+    '0': '待付款',
+    '1': '待发货',
+    '2': '待收货',
+    '3': '已完成',
+    '4': '已关闭'
+}
 // TODO 拼团订单不能退款
 Page({
     data: {
@@ -42,10 +49,10 @@ Page({
         })
     },
     toGoodsList: function (e) {
-        let orderId = this.data.orderId;
-        wx.navigateTo({
-            url: '/pages/ucenter/goods-list/index?id=' + orderId,
-        });
+        // let orderId = this.data.orderId;
+        // wx.navigateTo({
+        //     url: '/pages/ucenter/goods-list/index?id=' + orderId,
+        // });
     },
     toExpressInfo: function (e) {
         let orderId = this.data.orderId;
@@ -79,14 +86,15 @@ Page({
         var orderId = wx.getStorageSync('orderId');
         let userInfo = wx.getStorageSync('userInfo');
         this.setData({
-            orderId: orderId,
-            userInfo:userInfo
+            orderId,
+            userInfo
         });
         wx.showLoading({
             title: '加载中...',
         })
         this.getOrderDetail();
-        this.getExpressInfo();
+        // 获取物流信息，暂未使用
+        // this.getExpressInfo();
     },
     onUnload: function () {
         let oCancel = this.data.handleOption.cancel;
@@ -140,29 +148,37 @@ Page({
         });
     },
     getOrderDetail: function () {
-        let that = this;
-        util.request(api.OrderDetail, {
-            orderId: that.data.orderId
-        }).then(function (res) {
-            if (res.errno === 0) {
-                that.setData({
-                    orderInfo: res.data.orderInfo,
-                    orderGoods: res.data.orderGoods,
-                    handleOption: res.data.handleOption,
-                    textCode: res.data.textCode,
-                    goodsCount: res.data.goodsCount
-                });
-                let receive = res.data.textCode.receive;
-                if (receive == true) {
-                    let confirm_remainTime = res.data.orderInfo.confirm_remainTime;
-                    remaintimer.reTime(confirm_remainTime, 'c_remainTime', that);
-                }
-                let oCancel = res.data.handleOption.cancel;
-                let payTime = 0;
-                if (oCancel == true) {
-                    payTime = res.data.orderInfo.final_pay_time
-                    that.orderTimer(payTime);
-                }
+        const { orderId } = this.data;
+        util.request(api.OrderDetail, { orderId }).then((res) => {
+            const { code, data } = res;
+            if (code === 200) {
+                console.log(data);
+                const { status, orderItemList } = data;
+                this.setData({
+                    orderInfo: {
+                        ...data,
+                        statusName: STATUS_MAP[status]
+                    },
+                    orderGoods: orderItemList
+                })
+                // that.setData({
+                //     orderInfo: res.data.orderInfo,
+                //     orderGoods: res.data.orderGoods,
+                //     handleOption: res.data.handleOption,
+                //     textCode: res.data.textCode,
+                //     goodsCount: res.data.goodsCount
+                // });
+                // let receive = res.data.textCode.receive;
+                // if (receive == true) {
+                //     let confirm_remainTime = res.data.orderInfo.confirm_remainTime;
+                //     remaintimer.reTime(confirm_remainTime, 'c_remainTime', that);
+                // }
+                // let oCancel = res.data.handleOption.cancel;
+                // let payTime = 0;
+                // if (oCancel == true) {
+                //     payTime = res.data.orderInfo.final_pay_time
+                //     that.orderTimer(payTime);
+                // }
             }
         });
         wx.hideLoading();
