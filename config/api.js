@@ -35,7 +35,7 @@ module.exports = {
     RegionList: ApiRootUrl + 'region/list', //获取区域列表
     // 订单
     PayPrepayId: ApiRootUrl + 'pay/preWeixinPay', //获取微信统一下单prepay_id
-    OrderSubmit: ApiRootUrl + 'order/submit', // 提交订单
+    OrderSubmit: ApiRootUrl + '/order/generateOrder', // 提交订单
     OrderList: ApiRootUrl + '/order/list', //订单列表
     OrderDetail: ApiRootUrl + '/order/detail/{orderId}', //订单详情
     OrderDelete: ApiRootUrl + '/order/deleteOrder', //订单删除
@@ -47,8 +47,8 @@ module.exports = {
     OrderGoods: ApiRootUrl + 'order/orderGoods', // 获取checkout页面的商品列表
     // 足迹
     FootprintCreate: ApiRootUrl + '/member/readHistory/create', // 创建浏览记录
-    FootprintList: ApiRootUrl + 'footprint/list', //足迹列表
-    FootprintDelete: ApiRootUrl + 'footprint/delete', //删除足迹
+    FootprintList: ApiRootUrl + '/member/readHistory/list', //足迹列表
+    FootprintDelete: ApiRootUrl + '/member/readHistory/delete', //删除足迹
     // 搜索
     SearchIndex: ApiRootUrl + 'search/index', //搜索页面数据
     SearchHelper: ApiRootUrl + 'search/helper', //搜索帮助

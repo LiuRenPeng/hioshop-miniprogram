@@ -163,7 +163,7 @@ Page({
             return false;
         }
         wx.navigateTo({
-            url: `/pages/order-check/index?cartIds=${checkedGoods.map(item => item.productSkuId)}`
+            url: `/pages/order-check/index?cartIds=${checkedGoods.map(item => item.id)}`
         })
     },
     checkedItem: function(e) {
