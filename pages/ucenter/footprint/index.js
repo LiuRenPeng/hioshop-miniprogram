@@ -7,43 +7,23 @@ Page({
     data: {
         footprintList: [],
         allFootprintList: [],
-        allPage: 1,
-        allCount: 0,
-        size: 8,
+        pageNum: 1,
+        totalPage: 1,
+        pageSize: 10,
         hasPrint: 1,
         showNoMore: 1,
     },
     getFootprintList() {
-        let that = this;
-        util.request(api.FootprintList, { page: that.data.allPage, size: that.data.size }).then(function (res) {
-            if (res.errno === 0) {
-                let count = res.data.count;
-                let f1 = that.data.footprintList;
-                let f2 = res.data.data;
-                for (let i = 0; i < f2.length; i++) {
-                    let last = f1.length - 1;
-                    if (last >= 0 && f1[last][0].add_time == f2[i].add_time) {
-                        f1[last].push(f2[i]);
-                    }
-                    else {
-                        let tmp = [];
-                        tmp.push(f2[i])
-                        f1.push(tmp);
-                    }
-                }
-
-                that.setData({
-                    allCount: count,
-                    allFootprintList: that.data.allFootprintList.concat(res.data.data),
-                    allPage: res.data.currentPage,
-                    footprintList: f1,
+        const { pageSize, pageNum, footprintList } = this.data;
+        util.request(api.FootprintList, { pageNum, pageSize }).then((res) => {
+            const { code, data } = res;
+            if (code === 200) {
+                const { list, totalPage } = data;
+                this.setData({
+                    hasPrint: list && list.length > 0,
+                    showNoMore: totalPage === pageNum,
+                    footprintList: footprintList.concat(list)
                 });
-                if (count == 0) {
-                    that.setData({
-                        hasPrint: 0,
-                        showNoMore: 1
-                    });
-                }
             }
             // wx.hideLoading();
         });
@@ -52,23 +32,21 @@ Page({
         this.getFootprintList();
     },
     deletePrint: function (e) {
-        let that = this;
         let id = e.currentTarget.dataset.val;
-        util.request(api.FootprintDelete, { footprintId: id }, 'POST').then(function (res) {
-            if (res.errno === 0) {
+        util.request(api.FootprintDelete, { ids: [id] }, 'POST', 'query').then((res) => {
+            const { code } = res;
+            if (code === 200) {
                 wx.showToast({
-                    title: '取消成功',
-                    icon: 'success',
-                    mask: true
+                    title: '移除成功',
+                    icon: 'none'
                 });
-                that.setData({
+                this.setData({
                     footprintList: [],
                     allFootprintList: [],
-                    allPage: 1,
-                    allCount: 0,
-                    size: 8
+                    pageNum: 1,
+                    pageSize: 10
                 });
-                that.getFootprintList();
+                this.getFootprintList();
             }
         });
     },
@@ -78,16 +56,16 @@ Page({
         });
     },
     onReachBottom: function () {
-        let that = this;
-        if (that.data.allCount / that.data.size < that.data.allPage) {
-            that.setData({
-                showNoMore: 0
+        const { totalPage, pageNum } = this.data;
+        if (pageNum === totalPage) {
+            this.setData({
+                showNoMore: true
             });
             return false;
         }
-        that.setData({
-            allPage: that.data.allPage + 1
+        this.setData({
+            pageNum: pageNum + 1
         });
-        that.getFootprintList();
+        this.getFootprintList();
     }
 })
